@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, CloudSun, Copy, RotateCcw } from "lucide-react";
+import { Check, CloudSun, Copy, Map, RotateCcw } from "lucide-react";
 import { Markdown } from "@/components/eve/markdown";
 import type { ChatMessage } from "@/lib/chat/types";
 import { messageText } from "@/lib/chat/types";
@@ -50,6 +50,36 @@ export function MessageList({
                       <p className="mt-1 text-xs text-muted-foreground">Sample data, not live conditions.</p>
                     </div>
                   </div>
+                );
+              }
+              if (block.kind === "trip") {
+                return (
+                  <section key={block.id} className="max-w-lg rounded-xl border border-border bg-card px-4 py-3">
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="grid size-9 place-items-center rounded-lg bg-muted">
+                        <Map className="size-4" />
+                      </span>
+                      <div>
+                        <h3 className="text-sm font-medium">
+                          {block.days} {block.days === 1 ? "day" : "days"} in {block.city}
+                        </h3>
+                        <p className="text-xs text-muted-foreground">A plan you can keep. It stays with this chat.</p>
+                      </div>
+                    </div>
+                    <ol className="space-y-3">
+                      {block.stops.map((stop) => (
+                        <li key={stop.day} className="grid grid-cols-[auto_1fr] gap-3">
+                          <span className="pt-0.5 text-xs font-medium text-muted-foreground tabular-nums">
+                            Day {stop.day}
+                          </span>
+                          <div>
+                            <p className="text-sm font-medium">{stop.title}</p>
+                            <p className="text-sm text-muted-foreground">{stop.detail}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
                 );
               }
               if (block.kind === "memory") {

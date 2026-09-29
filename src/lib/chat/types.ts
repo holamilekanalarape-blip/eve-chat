@@ -1,3 +1,5 @@
+import type { TripDay } from "@/lib/chat/trip";
+
 export type WeatherBlock = {
   id: string;
   kind: "weather";
@@ -20,7 +22,15 @@ export type TextBlock = {
   text: string;
 };
 
-export type Block = TextBlock | WeatherBlock | MemoryBlock;
+export type TripBlock = {
+  id: string;
+  kind: "trip";
+  city: string;
+  days: number;
+  stops: TripDay[];
+};
+
+export type Block = TextBlock | WeatherBlock | MemoryBlock | TripBlock;
 
 export type ChatMessage = {
   id: string;
@@ -49,6 +59,10 @@ export function messageText(message: ChatMessage) {
       if (block.kind === "text") return block.text;
       if (block.kind === "weather") {
         return `(Sample weather for ${block.city}: ${block.tempC}°C, ${block.condition}. Not live data.)`;
+      }
+      if (block.kind === "trip") {
+        const days = block.stops.map((stop) => `Day ${stop.day}: ${stop.title}. ${stop.detail}`).join("\n");
+        return `(${block.days} days in ${block.city}\n${days})`;
       }
       if (!block.ok) return `(Memory was not changed: ${block.text})`;
       return block.action === "save"

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { Block, Chat, ChatMessage, MemoryBlock, WeatherBlock } from "@/lib/chat/types";
+import type { Block, Chat, ChatMessage, MemoryBlock, TripBlock, WeatherBlock } from "@/lib/chat/types";
 import { titleFromPrompt } from "@/lib/chat/types";
 
 const MAX_CHATS = 40;
@@ -21,6 +21,7 @@ type ChatState = {
   beginAssistant: (chatId: string) => string;
   pushText: (chatId: string, messageId: string, delta: string) => void;
   pushWeather: (chatId: string, messageId: string, weather: Omit<WeatherBlock, "id" | "kind">) => void;
+  pushTrip: (chatId: string, messageId: string, trip: Omit<TripBlock, "id" | "kind">) => void;
   pushMemory: (chatId: string, messageId: string, memory: Omit<MemoryBlock, "id" | "kind">) => void;
   setMessageError: (chatId: string, messageId: string, error: string | undefined) => void;
   dropMessage: (chatId: string, messageId: string) => void;
@@ -135,6 +136,21 @@ export const useChatStore = create<ChatState>()(
                     id: crypto.randomUUID(),
                     kind: "weather",
                     ...weather,
+                  }),
+                }))
+              : chat,
+          ),
+        })),
+      pushTrip: (chatId, messageId, trip) =>
+        set((state) => ({
+          chats: state.chats.map((chat) =>
+            chat.id === chatId
+              ? mapMessage(chat, messageId, (message) => ({
+                  ...message,
+                  blocks: appendBlock(message.blocks, {
+                    id: crypto.randomUUID(),
+                    kind: "trip",
+                    ...trip,
                   }),
                 }))
               : chat,

@@ -1,5 +1,6 @@
 import { useChatStore } from "@/lib/chat/store";
 import { messageText } from "@/lib/chat/types";
+import { planFromPrompt } from "@/lib/chat/trip";
 
 const started = new Set<string>();
 
@@ -30,6 +31,9 @@ export async function streamReply(
     .slice(-16);
 
   const assistantId = store.beginAssistant(chatId);
+  const lastUser = [...chat.messages].reverse().find((message) => message.role === "user");
+  const trip = lastUser ? planFromPrompt(messageText(lastUser)) : null;
+  if (trip) useChatStore.getState().pushTrip(chatId, assistantId, trip);
   let sawText = false;
 
   try {
